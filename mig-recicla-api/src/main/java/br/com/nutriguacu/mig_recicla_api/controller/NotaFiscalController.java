@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.nutriguacu.mig_recicla_api.model.NotaFiscal;
@@ -22,27 +21,30 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotaFiscalController {
 
-    private final NotaFiscalRepository notaFiscalRepository;
+	private final NotaFiscalRepository notaFiscalRepository;
 
-    @GetMapping
-    public List<NotaFiscal> listar() {
-        return notaFiscalRepository.findAll();
-    }
+	@GetMapping
+	public List<NotaFiscal> listar() {
+		return notaFiscalRepository.findAll();
+	}
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public NotaFiscal adicionar(@RequestBody NotaFiscal notaFiscal) {
-        // Como a NF tem um relacionamento com o Cliente, 
-        // o JSON de envio precisará conter o objeto cliente com seu ID.
-        return notaFiscalRepository.save(notaFiscal);
-    }
+	@PostMapping
+	public ResponseEntity<?> adicionar(@RequestBody NotaFiscal notaFiscal) {
+		if (notaFiscalRepository.existsByNumeroDaNota(notaFiscal.getNumeroDaNota())) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("{\"erro\": \"Esta Nota Fiscal já está cadastrada no sistema!\"}");
+		}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        if (!notaFiscalRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        notaFiscalRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
+		NotaFiscal salva = notaFiscalRepository.save(notaFiscal);
+		return ResponseEntity.status(HttpStatus.CREATED).body(salva);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deletar(@PathVariable Long id) {
+		if (!notaFiscalRepository.existsById(id)) {
+			return ResponseEntity.notFound().build();
+		}
+		notaFiscalRepository.deleteById(id);
+		return ResponseEntity.noContent().build();
+	}
 }

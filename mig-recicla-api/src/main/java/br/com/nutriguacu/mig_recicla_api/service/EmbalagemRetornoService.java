@@ -31,11 +31,11 @@ public class EmbalagemRetornoService {
                 .orElseThrow(() -> new RuntimeException("Motorista/Funcionário não encontrado!"));
 
         // 3. Atualiza os dados
-        embalagem.setQuantidadeBags(quantidadeQueVoltou);
+        embalagem.setQuantidadeRetornada(quantidadeQueVoltou);
         embalagem.setStatus(StatusDevolucao.RECEBIDO_NUTRIGUACU);
         embalagem.setDataRecebimento(LocalDate.now());
         
-        // 4. Associa o motorista à devolução!
+        // 4. Associa o motorista à devolução
         embalagem.setFuncionarioRecebedor(motorista);
 
         return repository.save(embalagem);

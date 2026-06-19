@@ -26,6 +26,9 @@ public class EmbalagemRetorno {
 
     @Column(nullable = false)
     private Integer quantidadeBags;
+    
+    @Column(name = "quantidade_retornada")
+    private Integer quantidadeRetornada;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
